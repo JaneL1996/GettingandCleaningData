@@ -1,6 +1,7 @@
 # GettingandCleaningData
-#-------------------------------------------------------------------------------
-# 1. Merge the training and the test sets to create one data set.
+-------------------------------------------------------------------------------
+1. Merge the training and the test sets to create one data set.
+
 if(!file.exists("./data")) dir.create("./data")
 fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 download.file(fileUrl, destfile = "./data/projectData_getCleanData.zip")
@@ -15,28 +16,28 @@ trainData <- cbind(train.subject, train.y, train.x)
 testData <- cbind(test.subject, test.y, test.x)
 fullData <- rbind(trainData, testData
                   
-#-------------------------------------------------------------------------------
-# 2. Extract only the measurements on the mean and standard deviation for each measurement. 
+-------------------------------------------------------------------------------
+2. Extract only the measurements on the mean and standard deviation for each measurement. 
 featureName <- read.table("./data/UCI HAR Dataset/features.txt", stringsAsFactors = FALSE)[,2]
 featureIndex <- grep(("mean\\(\\)|std\\(\\)"), featureName)
 finalData <- fullData[, c(1, 2, featureIndex+2)]
 colnames(finalData) <- c("subject", "activity", featureName[featureIndex])
 
-#-------------------------------------------------------------------------------
-# 3. Uses descriptive activity names to name the activities in the data set
+-------------------------------------------------------------------------------
+3. Uses descriptive activity names to name the activities in the data set
 activityName <- read.table("./data/UCI HAR Dataset/activity_labels.txt")
 finalData$activity <- factor(finalData$activity, levels = activityName[,1], labels = activityName[,2])
 
-#-------------------------------------------------------------------------------
-# 4. Appropriately labels the data set with descriptive variable names.
+-------------------------------------------------------------------------------
+4. Appropriately labels the data set with descriptive variable names.
 names(finalData) <- gsub("\\()", "", names(finalData))
 names(finalData) <- gsub("^t", "time", names(finalData))
 names(finalData) <- gsub("^f", "frequence", names(finalData))
 names(finalData) <- gsub("-mean", "Mean", names(finalData))
 names(finalData) <- gsub("-std", "Std", names(finalData))
 
-#-------------------------------------------------------------------------------
-# 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+-------------------------------------------------------------------------------
+5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 library(dplyr)
 summarise_all(group_by(finalData,subject),activity,mmean)
 write.table(groupData, "./Data/MeanData.txt", row.names = FALSE)
